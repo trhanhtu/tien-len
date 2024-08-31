@@ -1,0 +1,47 @@
+'1' người chơi 1 thắng
+'2' người chơi 2 thắng
+'3' người chơi 3 thắng
+'4' người chơi 4 thắng
+'w' cả phòng chờ đợi bắt đầu
+'a' lượt người chơi 1 đi
+'b' lượt người chơi 2 đi
+'c' lượt người chơi 3 đi
+'d' lượt người chơi 4 đi
+'0' dừng trận đấu
+
+
+
+0 cả phòng chờ đợi bắt đầu
+1 người chơi 1 đi
+2 người chơi 2 đi
+3 người chơi 3 đi
+4 người chơi 4 đi
+10 hủy trận
+11 người chơi 1 thắng
+12 người chơi 2 thắng
+13 người chơi 3 thắng
+14 người chơi 4 thắng
+
+
+
+2  trạng thái người chơi 1( thoát / không gì cả/ bỏ lượt)
+2  trạng thái người chơi 2( thoát / không gì cả/ bỏ lượt)
+2  trạng thái người chơi 3( thoát / không gì cả/ bỏ lượt)
+2  trạng thái người chơi 4( thoát / không gì cả/ bỏ lượt)
+
+4   số bài còn lại của người 1 (0xe == sẵn sàng) (0x00 == thắng)
+4   số bài còn lại của người 2 (0xe == sẵn sàng) (0x00 == thắng)
+4   số bài còn lại của người 3 (0xe == sẵn sàng) (0x00 == thắng)
+4   số bài còn lại của người 4 (0xe == sẵn sàng) (0x00 == thắng)
+
+00000000_00_00_00_00_0000_0000_0000_0000
+00000000_01_00_00_00_1111_1111_1111_1111
+
+ide,out,out,out,-1,-1,-1,-1
+out
+ide_
+pas_
+now_
+win
+
+người 

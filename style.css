@@ -1,0 +1,175 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.app {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 15% 70% 15%;
+    grid-template-rows: 20% 60% 20%;
+    grid-template-areas:
+        "info-tab top-player-area setting-area"
+        "left-player-area main-desk right-player-area"
+        "chat-area current-player-area controller-area";
+    min-width: 800px;
+    min-height: 600px;
+}
+
+
+.info-tab {
+    grid-area: info-tab;
+    background-color: aqua;
+    text-align: center;
+    align-content: center;
+    font-size: 30px;
+}
+
+.top-player-area {
+    grid-area: top-player-area;
+    background-color: bisque;
+    text-align: center;
+    font-size: 30px;
+}
+
+.setting-area {
+    grid-area: setting-area;
+    background-color: cadetblue;
+    text-align: center;
+    align-content: center;
+    font-size: 30px;
+}
+
+.left-player-area {
+    grid-area: left-player-area;
+    background-color: chartreuse;
+    align-content: center;
+    font-size: 30px;
+}
+
+.main-desk {
+    grid-area: main-desk;
+    background-color: chocolate;
+    text-align: center;
+    align-content: center;
+    font-size: 30px;
+    /* grid-column: 1 / 3; Spans from the 1st to 3rd column */
+    /* grid-row: 2 / 4;    Spans from the 2nd to 4th row */
+}
+
+.right-player-area {
+    grid-area: right-player-area;
+    background-color: cornflowerblue;
+    text-align: end;
+    align-content: center;
+    font-size: 30px;
+}
+
+.chat-area {
+    grid-area: chat-area;
+    background-color: cornsilk;
+}
+
+.current-player-area {
+    grid-area: current-player-area;
+
+}
+
+.controller-area {
+    grid-area: controller-area;
+    background-color: darkgray;
+}
+
+.card-container {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.card-on-desk-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 8vw;
+}
+
+.card-on-main-desk {
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+ */
+    user-select: none;
+    /* Standard */
+}
+
+.current-player-card {
+    font-size: 6vw;
+    display: inline-flex;
+    cursor: grab;
+    background-color: transparent;
+    border-color: transparent;
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+ */
+    user-select: none;
+    /* Standard */
+}
+
+.infoText {
+    position: absolute;
+}
+
+.player-avatar {
+    border-radius: 20px;
+    height: 50px;
+    width: auto;
+    aspect-ratio: 1/1;
+}
+
+.player-name {
+    margin: 0px 0px;
+}
+
+.lobby {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    height: 100%;
+}
+
+.login-left-side {
+    grid-column: 1 2;
+    background-color: snow;
+}
+
+.room-right-side {
+    grid-column: 2 3;
+}
+
+.button-room {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.head-table {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: orchid;
+
+}
+
+.room-right-side>table {
+    border-collapse: collapse;
+    border: none;
+}
+

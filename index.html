@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiến Lên</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="lobby.js" defer></script>
+</head>
+
+<body>
+    <div class="lobby">
+        <div class="login-left-side">
+            <h1 style="text-align: center;">Đăng nhập</h1>
+            <table>
+                <tr>
+                    <td>
+                        <label for="email-input">email</label>
+                    </td>
+                    <td>
+                        <input autocomplete="email" id="email-input" type="email" name="email">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="password-input">mật khẩu</label>
+                    </td>
+                    <td>
+                        <input autocomplete="current-password" id="password-input" type="text" name="password">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <button onclick="app_lobby.login()">Đăng Nhập</button>
+                    </td>
+
+                </tr>
+            </table>
+            <p>titen46518@iteradev.com</p>
+            <p>12345678aA@</p>
+        </div>
+        <div class="room-right-side">
+            <table style="width: 100%;">
+                <tr style="height: 30px;background-color: salmon;">
+                    <th style="text-align: center;">chủ phòng</th>
+                    <th style="text-align: center;">số người</th>
+                    <th style="text-align: center;">chế độ</th>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button class="button-room">
+                            <p id="captain-name" style="text-align: center;">nguyễn @gmail.com</p>
+                            <p id="amount" style="text-align: center;">0/4</p>
+                            <p style="text-align: center;">tiến lên</p>
+                        </button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="3">
+                        <button class="button-room">
+                            <p id="captain-name" style="text-align: center;">nguyễn @gmail.com</p>
+                            <p id="amount" style="text-align: center;">0/4</p>
+                            <p style="text-align: center;">tiến lên</p>
+                        </button>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+    </div>
+</body>
+
+</html>
