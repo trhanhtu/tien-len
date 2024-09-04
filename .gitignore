@@ -1,1 +1,27 @@
-'node_modules/'  
+# Environment Files
+supabase/.env.local
+supabase/.env
+
+# Supabase Build and Cache
+supabase/.supabase
+supabase/.cache
+
+# Node Modules
+node_modules/
+
+# Compiled Files
+functions/**/dist/
+functions/**/build/
+functions/**/index.js
+functions/**/index.js.map
+
+# Other Environment Files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# sql files
+.sql
+.py
