@@ -20,8 +20,15 @@ class Lobby {
         this.form = queryForm();
         this.supabase = createClient(supabaseUrl, supabaseKey);
     }
-    loadRooms() {
-        this.supabase.from("match").select()
+    async loadRooms() {
+        const {data , error} = await this.supabase.from('sm_Game.v_get_room_info')
+        .select('*');
+        if (error) {
+            console.error('Error fetching data from view:', error);
+          } else {
+            console.log('Data from view:', data);
+            
+          }
     }
     createRoom() {
 

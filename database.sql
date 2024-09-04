@@ -16,12 +16,14 @@ CREATE TABLE sm_Game.tb_players (
 -- Table for matches
 CREATE TABLE sm_Game.tb_match (
     match_id SERIAL NOT NULL PRIMARY KEY,
-    type SMALLINT DEFAULT 0 NOT NULL,
+    attack_type SMALLINT DEFAULT 0 NOT NULL,
     score INTEGER DEFAULT 0 NOT NULL,
     who_turn SMALLINT DEFAULT 1 NOT NULL,
-    players_id UUID[] NOT NULL,
-    players_email VARCHAR(100)[] NOT NULL
-    state char(27) not null default 'ide,out,out,out,-1,-1,-1,-1'
+    players_id_array UUID[] NOT NULL CHECK (array_length(players_id_array, 1) <= 4),
+    players_email_array VARCHAR(100)[] NOT NULL CHECK (array_length(players_email_array, 1) = 4),
+    players_cards_array SMALLINT[] DEFAULT '{-1,-1,-1,-1}' NOT NULL CHECK (array_length(players_cards_array, 1) <= 4),
+    players_state_array CHAR(3)[] NOT NULL DEFAULT '{"ide","out", "out", "out"}' CHECK (array_length(players_state_array, 1) <= 4),
+    players_ping_array SMALLINT[] DEFAULT '{0,0,0,0}' NOT NULL CHECK (array_length(players_ping_array, 1) <= 4)
 );
 
 CREATE OR REPLACE FUNCTION sm_Game.create_player_on_auth_insert()

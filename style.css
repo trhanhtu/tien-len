@@ -69,6 +69,13 @@ body {
     font-size: 30px;
 }
 
+.create-new-room-btn{
+    border-radius: 50%;
+    background-color: coral;
+    color: aliceblue;
+    font-weight: 500;
+}
+
 .chat-area {
     grid-area: chat-area;
     background-color: cornsilk;
