@@ -153,12 +153,12 @@ body {
 }
 
 .login-left-side {
-    grid-column: 1 2;
+    grid-column: 1/2;
     background-color: snow;
 }
 
 .room-right-side {
-    grid-column: 2 3;
+    grid-column: 2/3;
 }
 
 .button-room {

@@ -20,7 +20,7 @@
                         <label for="email-input">email</label>
                     </td>
                     <td>
-                        <input autocomplete="email" id="email-input" type="email" name="email">
+                        <input value="user1@tienlen.com" autocomplete="email" id="email-input" type="email" name="email">
                     </td>
                 </tr>
                 <tr>
@@ -28,7 +28,7 @@
                         <label for="password-input">mật khẩu</label>
                     </td>
                     <td>
-                        <input autocomplete="current-password" id="password-input" type="text" name="password">
+                        <input value="12345678aA@" autocomplete="current-password" id="password-input" type="text" name="password">
                     </td>
                 </tr>
                 <tr>
@@ -38,38 +38,26 @@
 
                 </tr>
             </table>
-            <p>titen46518@iteradev.com</p>
+            <p>user1@tienlen.com</p>
             <p>12345678aA@</p>
         </div>
         <div class="room-right-side">
-            <table style="width: 100%;">
-                <tr style="height: 30px;background-color: salmon;">
+            <div>
+                <button class="create-new-room-btn" onclick="this.disabled = true;app_lobby.createRoom()">+</button>
+                <button class="create-new-room-btn" onclick="this.disabled = true;app_lobby.createRoom()">tải lại</button>
+            </div>
+            <table  style="width: 100%;">
+                <thead style="height: 30px;background-color: salmon;">
                     <th style="text-align: center;">chủ phòng</th>
                     <th style="text-align: center;">số người</th>
                     <th style="text-align: center;">chế độ</th>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <button class="button-room">
-                            <p id="captain-name" style="text-align: center;">nguyễn @gmail.com</p>
-                            <p id="amount" style="text-align: center;">0/4</p>
-                            <p style="text-align: center;">tiến lên</p>
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="3">
-                        <button class="button-room">
-                            <p id="captain-name" style="text-align: center;">nguyễn @gmail.com</p>
-                            <p id="amount" style="text-align: center;">0/4</p>
-                            <p style="text-align: center;">tiến lên</p>
-                        </button>
-                    </td>
-                </tr>
+                </thead>
+                <tbody id="room-list">
+                    <!-- danh sách phòng ở đây -->
+                </tbody>
 
             </table>
-            <button class="create-new-room-btn">+</button>
+
         </div>
 
 
