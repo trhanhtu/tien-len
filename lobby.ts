@@ -92,8 +92,8 @@ class Lobby {
         sessionStorage.setItem("email", user_email);
         this.loadRooms();
     }
-    enterRoom() {
-
+    enterRoom(match_id:number) {
+        window.location.href = "room.html";
     }
     async checkIfLoggedIn() {
         const { data, error } = await this.supabase.auth.getSession()
@@ -125,7 +125,7 @@ function constructRoomHTMLElementString(room:RoomInfo): string {
     return `
     <tr>
         <td colspan="3">
-            <button class="button-room">
+            <button class="button-room"  onclick="app_lobby.enterRoom(${room.match_id})">
                 <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
                 <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
                 <p style="text-align: center;">tiến lên</p>

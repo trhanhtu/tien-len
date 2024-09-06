@@ -69,7 +69,7 @@ body {
     font-size: 30px;
 }
 
-.create-new-room-btn{
+.create-new-room-btn {
     border-radius: 50%;
     background-color: coral;
     color: aliceblue;
@@ -164,7 +164,12 @@ body {
 .button-room {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    &:hover {
+        background-image: url("https://store-images.s-microsoft.com/image/apps.36340.13930766332958392.910195fd-d16a-4529-9806-8d70ff1aeaa7.f7b20b98-b5b5-47b7-99d9-48be58d201b0"), linear-gradient(-45deg, #BBE44D, #caed6b, #def4a1, #f2f9de);
+        background-repeat: no-repeat;
+        background-size: contain, cover;
+    }
 }
 
 .head-table {
@@ -179,4 +184,3 @@ body {
     border-collapse: collapse;
     border: none;
 }
-
