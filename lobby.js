@@ -1,16 +1,12 @@
+
 class Lobby {
     form;
     room_list;
     constructor() {
-        initView();
-        this.form = queryForm();
+        this.initView();
         const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
         window.my_supabase = supabase.createClient(supabaseUrl, supabaseKey);
-        this.room_list = {
-            array: document.getElementById("room-list"),
-            isRefreshable: true
-        };
     }
     async loadRooms() {
         if (this.room_list.isRefreshable === false) {
@@ -83,16 +79,21 @@ class Lobby {
         sessionStorage.setItem("supabase", JSON.stringify(window.my_supabase));
         window.location.href = "room.html";
     }
+    async initView() {
+        const response = await fetch('https://raw.githubusercontent.com/trhanhtu/tien-len/v0.2/lobby.html');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const htmlContent = await response.text();
+        document.getElementById('app-body').innerHTML = htmlContent;
+        this.form = queryForm();
+        this.room_list = {
+            array: document.getElementById("room-list"),
+            isRefreshable: true
+        };
+    }
 }
 //========================== HELPER FUNCTION ===============================//
-async function initView() {
-    const response = await fetch('https://raw.githubusercontent.com/trhanhtu/tien-len/v0.2/lobby.html');
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const htmlContent = await response.text();
-    document.getElementById('app-body').innerHTML = htmlContent;
-}
 function queryForm() {
     const email_input = document.getElementById("email-input");
     const password_input = document.getElementById("password-input");

@@ -9,12 +9,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="errorhandle.js" defer></script>
     <script src="lobby.js" defer></script>
-    <script src="room.js" defer></script>
 </head>
 
 <body id="app-body">
-    <script>
-        let page = new Lobby();
+    <script defer>
+        let page = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            page = new Lobby();
+        });
+        function userEnterRoom(room_id){
+            page.enterRoom(room_id);
+            page = new Room();
+        }
     </script>
 </body>
 
