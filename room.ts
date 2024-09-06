@@ -1,5 +1,4 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { checkNullAndGet, errorHandle } from "./errorhandle";
 
 interface MatchInfo {
     match_id: number,
@@ -25,26 +24,26 @@ class Room {
     my_layout: Layout
     constructor() {
         // get supabase
-        const supabase_str = checkNullAndGet<string>(
+        const supabase_str = window.checkNullAndGet<string>(
             sessionStorage.getItem("supabase"),
             "khởi động thất bại: không kết nối được với supabase"
         );
         this.supabase = JSON.parse(supabase_str);
 
         //get email
-        this.my_email = checkNullAndGet<string>(sessionStorage.getItem("email"), "không tìm thấy email");
+        this.my_email = window.checkNullAndGet<string>(sessionStorage.getItem("email"), "không tìm thấy email");
         // get id
-        this.my_id = checkNullAndGet<string>(sessionStorage.getItem("id"), "không tìm thấy id");
+        this.my_id = window.checkNullAndGet<string>(sessionStorage.getItem("id"), "không tìm thấy id");
         this.my_position = -1;
 
         const directions: string[] = ["current", "right", "top", "left"];
         this.my_layout = {
             player_emails:
                 Array.from({ length: 4 }, (_, index) =>
-                    checkNullAndGet<HTMLElement>(document.getElementById(directions[index] + "-player-name"), "không tìm thấy tag tên người chơi"))
+                    window.checkNullAndGet<HTMLElement>(document.getElementById(directions[index] + "-player-name"), "không tìm thấy tag tên người chơi"))
             , player_cards_amount:
                 Array.from({ length: 4 }, (_, index) =>
-                    checkNullAndGet<HTMLElement>(document.getElementById(directions[index] + "-player-cards-amount"), "không tìm thấy tag bài người chơi"))
+                    window.checkNullAndGet<HTMLElement>(document.getElementById(directions[index] + "-player-cards-amount"), "không tìm thấy tag bài người chơi"))
 
         }
     }
@@ -53,16 +52,16 @@ class Room {
     }
     async constructView() {
         // get my name
-        const my_name = checkNullAndGet<HTMLElement>(document.getElementById("current-player-name"), "không tìm thấy tag id = my-name");
+        const my_name = window.checkNullAndGet<HTMLElement>(document.getElementById("current-player-name"), "không tìm thấy tag id = my-name");
         my_name.innerText = this.my_email
         // get room id
-        const room_id_tag = checkNullAndGet<HTMLElement>(document.getElementById("match-id"), "không tìm thấy tag id = match-id")
-        room_id_tag.innerText = checkNullAndGet<string>(sessionStorage.getItem("match_id"), "không tìm thấy match id");
+        const room_id_tag = window.checkNullAndGet<HTMLElement>(document.getElementById("match-id"), "không tìm thấy tag id = match-id")
+        room_id_tag.innerText = window.checkNullAndGet<string>(sessionStorage.getItem("match_id"), "không tìm thấy match id");
 
         // get players in room
-        const { data, error } = await this.supabase.from("sm_Game.tb_match").select("*").eq("match_id", room_id_tag.innerText).single<MatchInfo>();
+        const { data, error } = await this.supabase.schema("sm_game").from("tb_match").select("*").eq("sm_game.tb_match.match_id", room_id_tag.innerText).single<MatchInfo>();
         if (error) {
-            errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error));
+            window.errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error,null,2));
             return;
         }
         // assign seat for players
@@ -72,7 +71,7 @@ class Room {
     DrawPlayerOnScreen(match: MatchInfo) {
         this.my_position = match.players_email_array.indexOf(this.my_email);
         if (this.my_position === -1) {
-            errorHandle("vị trí của người chơi trong mảng không hợp lệ");
+            window.errorHandle("vị trí của người chơi trong mảng không hợp lệ");
             return;
         }
         // shift right layout so that current player view is bottom

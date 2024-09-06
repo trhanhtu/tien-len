@@ -1,13 +1,4 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { errorHandle } from './errorhandle';
-
-
-
-// Rest of your TypeScript code
-
-const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
-
 
 interface FormElement {
     email: HTMLInputElement,
@@ -31,6 +22,9 @@ class Lobby {
     room_list: RoomList
     constructor() {
         this.form = queryForm();
+        const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
+
         this.supabase = createClient(supabaseUrl, supabaseKey);
         this.room_list = {
             array: document.getElementById("room-list")!,
@@ -44,7 +38,7 @@ class Lobby {
         const { data, error } = await this.supabase.schema("sm_game").from('v_get_room_info')
             .select('*').returns<RoomInfo[]>();
         if (error) {
-            errorHandle('Error fetching data from view:\n' + JSON.stringify(error));
+            window.errorHandle('Error fetching data from view:\n' + JSON.stringify(error));
             return;
         }
 
@@ -56,15 +50,15 @@ class Lobby {
         const user_id = sessionStorage.getItem("id");
         const user_email = sessionStorage.getItem("email");
         if (!user_id || !user_email) {
-            errorHandle("không tìm thấy ID hoặc email");
+            window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await this.supabase.rpc("sm_Game.func_create_match_if_not_in_any", {
+        const { error } = await this.supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email
         });
         if (error) {
-            errorHandle('Lỗi khi tạo phòng:\n' + JSON.stringify(error.message));
+            window.errorHandle('Lỗi khi tạo phòng:\n' + JSON.stringify(error.message));
             return;
         }
 
@@ -78,13 +72,13 @@ class Lobby {
         });
 
         if (error) {
-            errorHandle('Error signing in:' + error.message);
+            window.errorHandle('Error signing in:' + error.message);
             return
         }
         const user_id = data.user?.id;
         const user_email = data.user?.email;
         if (!user_id || !user_email) {
-            errorHandle("không tìm thấy ID");
+            window.errorHandle("không tìm thấy ID");
             return;
         }
         sessionStorage.setItem("id", user_id);
@@ -95,16 +89,16 @@ class Lobby {
         const user_id = sessionStorage.getItem("id");
         const user_email = sessionStorage.getItem("email");
         if (!user_id || !user_email) {
-            errorHandle("không tìm thấy ID hoặc email");
+            window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await this.supabase.rpc("sm_game.func_join_match_if_not_in_any", {
+        const { error } = await this.supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email,
-            match_id: match_id
+            _match_id: match_id
         });
         if (error) {
-            errorHandle("không vào được phòng:\n" + JSON.stringify(error));
+            window.errorHandle("không vào được phòng:\n" + JSON.stringify(error));
             return;
         }
         //-save some infomation
@@ -116,7 +110,7 @@ class Lobby {
     //     const { data, error } = await this.supabase.auth.getSession()
 
     //     if (error) {
-    //         errorHandle('Error getting session:'+ error.)
+    //         window.errorHandle('Error getting session:'+ error.)
     //         return;
     //     }
 
