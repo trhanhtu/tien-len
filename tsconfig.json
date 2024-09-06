@@ -5,5 +5,5 @@
     "lib": ["esnext", "dom"],
     "strict": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules" , "card_game"]
 }

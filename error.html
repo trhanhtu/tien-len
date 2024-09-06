@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lỗi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body id="body">
+
+    <script>
+        const body = document.getElementById("body");
+        body.innerText += sessionStorage.getItem("error") || "không có tin nhắn lôi";
+        sessionStorage.clear();
+        localStorage.clear();
+    </script>
+</body>
+
+</html>

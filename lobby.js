@@ -1,4 +1,5 @@
-
+// import { createClient } from '@supabase/supabase-js';
+import { errorHandle } from './errorhandle';
 // Rest of your TypeScript code
 const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
@@ -21,12 +22,7 @@ class Lobby {
         const { data, error } = await this.supabase.schema("sm_game").from('v_get_room_info')
             .select('*').returns();
         if (error) {
-            console.error('Error fetching data from view:', error);
-        }
-        else {
-            console.log('Data from view:', data);
-        }
-        if (!data) {
+            errorHandle('Error fetching data from view:\n' + JSON.stringify(error));
             return;
         }
         for (let r of data) {
@@ -37,7 +33,7 @@ class Lobby {
         const user_id = sessionStorage.getItem("id");
         const user_email = sessionStorage.getItem("email");
         if (!user_id || !user_email) {
-            alert("không tìm thấy ID hoặc email");
+            errorHandle("không tìm thấy ID hoặc email");
             return;
         }
         const { error } = await this.supabase.rpc("sm_Game.func_create_match_if_not_in_any", {
@@ -45,7 +41,7 @@ class Lobby {
             player_email: user_email
         });
         if (error) {
-            alert('Lỗi khi tạo phòng:' + error.message);
+            errorHandle('Lỗi khi tạo phòng:\n' + JSON.stringify(error.message));
             return;
         }
         alert("tạo phòng thành công");
@@ -56,33 +52,39 @@ class Lobby {
             password: this.form.password.value,
         });
         if (error) {
-            console.error('Error signing in:', error.message);
+            errorHandle('Error signing in:' + error.message);
+            return;
         }
         const user_id = data.user?.id;
         const user_email = data.user?.email;
         if (!user_id || !user_email) {
-            alert("không tìm thấy ID");
+            errorHandle("không tìm thấy ID");
             return;
         }
         sessionStorage.setItem("id", user_id);
         sessionStorage.setItem("email", user_email);
         this.loadRooms();
     }
-    enterRoom(match_id) {
-        window.location.href = "room.html";
-    }
-    async checkIfLoggedIn() {
-        const { data, error } = await this.supabase.auth.getSession();
-        if (error) {
-            console.error('Error getting session:', error);
+    async enterRoom(match_id) {
+        const user_id = sessionStorage.getItem("id");
+        const user_email = sessionStorage.getItem("email");
+        if (!user_id || !user_email) {
+            errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        if (data.session) {
-            console.log('User is logged in:', data.session.user);
+        const { error } = await this.supabase.rpc("sm_game.func_join_match_if_not_in_any", {
+            player_id: user_id,
+            player_email: user_email,
+            match_id: match_id
+        });
+        if (error) {
+            errorHandle("không vào được phòng:\n" + JSON.stringify(error));
+            return;
         }
-        else {
-            console.log('User is not logged in.');
-        }
+        //-save some infomation
+        sessionStorage.setItem("match_id", match_id.toString());
+        sessionStorage.setItem("supabase", JSON.stringify(this.supabase));
+        window.location.href = "room.html";
     }
 }
 //========================== MAIN HERE ======================================//

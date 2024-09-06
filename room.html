@@ -13,9 +13,8 @@
     <div class="app">
         <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
         <div class="info-tab">
-            <p style="font-size: 10px;" id="my-name">what name. i eat chả</p>
-            <input  id="my-id" placeholder="user ID" type="text">
-            <button type="button" onclick="app.login()">đăng nhập</button>
+            <p id="match-id"><b>ID phòng:</b></p>
+            <p style="font-size: 10px;" id="current-player-name"></p>
         </div>
         <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
         <div class="top-player-area">
@@ -93,6 +92,7 @@
             <button onclick="app.splittingTheDeck()">Trộn</button>
             <button onclick="app.lauchAttack()">Đánh</button>
             <button onclick="app.lauchAttack()">Bỏ Chọn</button>
+            <p id="current-player-cards-amount" style="display: contents;">13</p>
         </div>
         <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
     </div>
