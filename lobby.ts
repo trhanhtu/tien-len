@@ -1,4 +1,9 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+declare global {
+    interface Window {
+        my_supabase: SupabaseClient; // Use the correct type for your Supabase client
+    }
+}
 
 interface FormElement {
     email: HTMLInputElement,
@@ -15,27 +20,27 @@ interface RoomInfo {
     email: string,
     player_count: number
 }
-
 class Lobby {
     form: FormElement
-    supabase: SupabaseClient
     room_list: RoomList
     constructor() {
+        initView();
         this.form = queryForm();
         const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
 
-        this.supabase = createClient(supabaseUrl, supabaseKey);
+        window.my_supabase = createClient(supabaseUrl, supabaseKey);
         this.room_list = {
             array: document.getElementById("room-list")!,
             isRefreshable: true
         };
     }
+    
     async loadRooms(): Promise<void> {
         if (this.room_list.isRefreshable === false) {
             return;
         }
-        const { data, error } = await this.supabase.schema("sm_game").from('v_get_room_info')
+        const { data, error } = await window.my_supabase.schema("sm_game").from('v_get_room_info')
             .select('*').returns<RoomInfo[]>();
         if (error) {
             window.errorHandle('Error fetching data from view:\n' + JSON.stringify(error));
@@ -53,7 +58,7 @@ class Lobby {
             window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await this.supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
+        const { error } = await window.my_supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email
         });
@@ -66,7 +71,7 @@ class Lobby {
 
     }
     async login(): Promise<void> {
-        const { data, error } = await this.supabase.auth.signInWithPassword({
+        const { data, error } = await window.my_supabase.auth.signInWithPassword({
             email: this.form.email.value,
             password: this.form.password.value,
         });
@@ -92,7 +97,7 @@ class Lobby {
             window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await this.supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
+        const { error } = await window.my_supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email,
             _match_id: match_id
@@ -103,28 +108,22 @@ class Lobby {
         }
         //-save some infomation
         sessionStorage.setItem("match_id", match_id.toString());
-        sessionStorage.setItem("supabase", JSON.stringify(this.supabase));
+        sessionStorage.setItem("supabase", JSON.stringify(window.my_supabase));
         window.location.href = "room.html";
     }
-    // async checkIfLoggedIn() {
-    //     const { data, error } = await this.supabase.auth.getSession()
-
-    //     if (error) {
-    //         window.errorHandle('Error getting session:'+ error.)
-    //         return;
-    //     }
-
-    //     if (data.session) {
-    //         console.log('User is logged in:', data.session.user)
-    //     } else {
-    //         console.log('User is not logged in.')
-    //     }
-    // }
+}
+//========================== HELPER FUNCTION ===============================//
+async function initView():Promise<void>{
+    const response = await fetch('https://raw.githubusercontent.com/trhanhtu/tien-len/v0.2/lobby.html');
+            
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    
+    const htmlContent = await response.text();
+    document.getElementById('app-body')!.innerHTML = htmlContent;
 }
 
-//========================== MAIN HERE ======================================//
-const app_lobby = new Lobby();
-//========================== HELPER FUNCTION ===============================//
 function queryForm(): FormElement {
     const email_input = document.getElementById("email-input")! as HTMLInputElement;
     const password_input = document.getElementById("password-input")! as HTMLInputElement;

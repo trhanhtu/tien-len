@@ -30,7 +30,7 @@ class Room {
         const room_id_tag = window.checkNullAndGet(document.getElementById("match-id"), "không tìm thấy tag id = match-id");
         room_id_tag.innerText = window.checkNullAndGet(sessionStorage.getItem("match_id"), "không tìm thấy match id");
         // get players in room
-        const { data, error } = await supabase.schema("sm_game").from("tb_match").select("*").eq("sm_game.tb_match.match_id", room_id_tag.innerText).limit(1);
+        const { data, error } = await this.supabase.schema("sm_game").from("tb_match").select("*").eq("sm_game.tb_match.match_id", room_id_tag.innerText).single();
         if (error) {
             window.errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error, null, 2));
             return;
@@ -60,3 +60,4 @@ app.init();
 function rotateArray(arr, k) {
     arr.concat(arr).slice(k, k + arr.length);
 }
+export {};
