@@ -1,12 +1,13 @@
-
 class Lobby {
     form;
     room_list;
+    user_id;
     constructor() {
         this.initView();
         const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
         window.my_supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        this.user_id = "";
     }
     async loadRooms() {
         if (this.room_list.isRefreshable === false) {
@@ -76,16 +77,14 @@ class Lobby {
         }
         //-save some infomation
         sessionStorage.setItem("match_id", match_id.toString());
-        sessionStorage.setItem("supabase", JSON.stringify(window.my_supabase));
         window.location.href = "room.html";
     }
     async initView() {
-        const response = await fetch('https://raw.githubusercontent.com/trhanhtu/tien-len/v0.2/lobby.html');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        const lobbyTemplate = document.getElementById("lobby-html");
+        if (lobbyTemplate) {
+            document.getElementById('main-body').appendChild(lobbyTemplate.content.cloneNode(true));
         }
-        const htmlContent = await response.text();
-        document.getElementById('app-body').innerHTML = htmlContent;
+        
         this.form = queryForm();
         this.room_list = {
             array: document.getElementById("room-list"),
@@ -103,7 +102,7 @@ function constructRoomHTMLElementString(room) {
     return `
     <tr>
         <td colspan="3">
-            <button class="button-room"  onclick="app_lobby.enterRoom(${room.match_id})">
+            <button class="button-room"  onclick="userEnterRoom(${room.match_id});">
                 <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
                 <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
                 <p style="text-align: center;">tiến lên</p>
@@ -112,3 +111,4 @@ function constructRoomHTMLElementString(room) {
     </tr>
     `;
 }
+

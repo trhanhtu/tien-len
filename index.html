@@ -11,17 +11,218 @@
     <script src="lobby.js" defer></script>
 </head>
 
-<body id="app-body">
+<body>
+    <main id="main-body">
+
+    </main>
     <script defer>
         let page = null;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             page = new Lobby();
         });
-        function userEnterRoom(room_id){
+        function userEnterRoom(room_id) {
             page.enterRoom(room_id);
             page = new Room();
         }
     </script>
+    <!-- ========================================= PAGE CLONE AREA ========================================= -->
+    <!-- ------------------------------------------ lobby ------------------------------------------ -->
+    <template id="lobby-html">
+        <div class="lobby">
+            <div class="login-left-side">
+                <h1 style="text-align: center;">Đăng nhập</h1>
+                <table>
+                    <tr>
+                        <td>
+                            <label for="email-input">email</label>
+                        </td>
+                        <td>
+                            <input value="user1@tienlen.com" autocomplete="email" id="email-input" type="email"
+                                name="email">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="password-input">mật khẩu</label>
+                        </td>
+                        <td>
+                            <input value="12345678aA@" autocomplete="current-password" id="password-input" type="text"
+                                name="password">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <button onclick="page.login()">Đăng Nhập</button>
+                        </td>
+
+                    </tr>
+                </table>
+                <p>user1@tienlen.com</p>
+                <p>12345678aA@</p>
+            </div>
+            <div class="room-right-side">
+                <div>
+                    <button class="create-new-room-btn" onclick="this.disabled = true;page.createRoom()">+</button>
+                    <button class="create-new-room-btn" onclick="this.disabled = true;page.createRoom()">tải
+                        lại</button>
+                </div>
+                <table style="width: 100%;">
+                    <thead style="height: 30px;background-color: salmon;">
+                        <th style="text-align: center;">chủ phòng</th>
+                        <th style="text-align: center;">số người</th>
+                        <th style="text-align: center;">chế độ</th>
+                    </thead>
+                    <tbody id="room-list">
+                        <!-- danh sách phòng ở đây -->
+                        <tr>
+                            <td colspan="3">
+                                <button class="button-room">
+
+                                    <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                                    <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4
+                                    </p>
+                                    <p style="text-align: center;">tiến lên</p>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button class="button-room">
+
+                                    <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                                    <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4
+                                    </p>
+                                    <p style="text-align: center;">tiến lên</p>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button class="button-room">
+                                    <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                                    <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4
+                                    </p>
+                                    <p style="text-align: center;">tiến lên</p>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </template>
+
+
+
+
+    <!-- ------------------------------------------ room ------------------------------------------- -->
+
+
+
+
+    <template id="room-html">
+        <div class="app">
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="info-tab">
+                <p id="match-id"><b>ID phòng:</b></p>
+                <p style="font-size: 10px;" id="current-player-name"></p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="top-player-area">
+                <span>
+                    <img id="top-player-image" class="player-avatar"
+                        src="https://w0.peakpx.com/wallpaper/266/119/HD-wallpaper-emblem-for-power-red-powerful-quiet-loud-fantastic-emblem-game-black-power-abstract-avatar-creepy-fantasy-3d-dark-awesome-thumbnail.jpg">
+                    <p style="display: contents;"> 🂠 ×</p>
+                    <p id="top-player-cards-amount" style="display: contents;">13</p>
+                </span>
+                <p id="top-player-name" class="player-name">tên gì đây trời</p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="setting-area">setting</div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="left-player-area">
+                <span>
+                    <img id="left-player-image" class="player-avatar"
+                        src="https://w0.peakpx.com/wallpaper/266/119/HD-wallpaper-emblem-for-power-red-powerful-quiet-loud-fantastic-emblem-game-black-power-abstract-avatar-creepy-fantasy-3d-dark-awesome-thumbnail.jpg">
+                    <p style="display: contents;"> 🂠 ×</p>
+                    <p id="left-player-cards-amount" style="display: contents;">13</p>
+                </span>
+                <p id="left-player-name" class="player-name">tên gì đây trời</p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="main-desk">
+                <div id="main-desk-cards-container" class="card-on-desk-container">
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                </div>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="right-player-area">
+                <span>
+                    <img id="right-player-image" class="player-avatar"
+                        src="https://w0.peakpx.com/wallpaper/266/119/HD-wallpaper-emblem-for-power-red-powerful-quiet-loud-fantastic-emblem-game-black-power-abstract-avatar-creepy-fantasy-3d-dark-awesome-thumbnail.jpg">
+                    <p style="display: contents;"> 🂠 ×</p>
+                    <p id="right-player-cards-amount" style="display: contents;">13</p>
+                </span>
+                <p id="right-player-name" class="player-name">tên gì đây trời</p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="chat-area">chat</div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="current-player-area">
+                <div id="current-player-card-container" class="card-container">
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(0)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(1)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(2)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(3)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(4)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(5)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(6)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(7)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(8)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(9)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(10)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(11)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="app.updateCardsInReadyHand(12)"></span>
+                </div>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="controller-area">
+                <button onclick="app.sortCards()">xếp</button>
+                <button onclick="app.splittingTheDeck()">Trộn</button>
+                <button onclick="app.lauchAttack()">Đánh</button>
+                <button onclick="app.lauchAttack()">Bỏ Chọn</button>
+                <p id="current-player-cards-amount" style="display: contents;">13</p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+        </div>
+    </template>
 </body>
 
 </html>

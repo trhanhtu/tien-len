@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "module": "esnext",             // Keep ESNext for module support
+    "moduleResolution": "node",     // Use Node module resolution for npm packages like Supabase
     "target": "esnext",
     "lib": ["esnext", "dom"],
     "strict": true
   },
-  "exclude": ["node_modules" , "card_game"]
+  "exclude": ["node_modules", "card_game"]
 }

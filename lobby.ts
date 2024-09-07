@@ -1,10 +1,13 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 declare global {
     interface Window {
         my_supabase: SupabaseClient; // Use the correct type for your Supabase client
     }
-}
 
+}
+declare const supabase: {
+    createClient: (supabaseUrl: string, supabaseKey: string) => SupabaseClient;
+};
 interface FormElement {
     email: HTMLInputElement,
     password: HTMLInputElement,
@@ -28,7 +31,7 @@ class Lobby {
         this.initView();
         const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
-        window.my_supabase = createClient(supabaseUrl, supabaseKey);
+        window.my_supabase = supabase.createClient(supabaseUrl, supabaseKey);
         this.user_id = "";
     }
 
@@ -107,14 +110,11 @@ class Lobby {
         window.location.href = "room.html";
     }
     async initView(): Promise<void> {
-        const response = await fetch('https://raw.githubusercontent.com/trhanhtu/tien-len/v0.2/lobby.html');
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const htmlContent = await response.text();
-        document.getElementById('app-body')!.innerHTML = htmlContent;
+        // get template for lobby
+        const lobbyTemplate = window.checkNullAndGet<HTMLTemplateElement>(document.getElementById("lobby-html") as HTMLTemplateElement, "không tải được lobby-html");
+        // attach lobby-html into main
+        document.getElementById('main-body')!.appendChild(lobbyTemplate.content.cloneNode(true));
+        // init view binding
         this.form = queryForm();
         this.room_list = {
             array: document.getElementById("room-list")!,
