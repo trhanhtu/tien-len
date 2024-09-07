@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "esnext",             // Keep ESNext for module support
-    "moduleResolution": "node",     // Use Node module resolution for npm packages like Supabase
+    "module": "esnext",             
+    "moduleResolution": "node",
     "target": "esnext",
     "lib": ["esnext", "dom"],
     "strict": true

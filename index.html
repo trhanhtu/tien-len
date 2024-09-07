@@ -9,22 +9,26 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="errorhandle.js" defer></script>
     <script src="lobby.js" defer></script>
+    <script src="room.js" defer></script>
 </head>
 
 <body>
     <main id="main-body">
 
     </main>
-    <script defer>
-        let page = null;
-        document.addEventListener('DOMContentLoaded', function () {
-            page = new Lobby();
-        });
-        function userEnterRoom(room_id) {
-            page.enterRoom(room_id);
-            page = new Room();
-        }
+    <script src="index.js" defer>
+       
     </script>
+
+
+
+
+
+
+
+
+
+
     <!-- ========================================= PAGE CLONE AREA ========================================= -->
     <!-- ------------------------------------------ lobby ------------------------------------------ -->
     <template id="lobby-html">
@@ -140,7 +144,9 @@
                 <p id="top-player-name" class="player-name">tên gì đây trời</p>
             </div>
             <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
-            <div class="setting-area">setting</div>
+            <div class="setting-area">setting
+                <button onclick="exitRoom();">Rời phòng</button>
+            </div>
             <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
             <div class="left-player-area">
                 <span>

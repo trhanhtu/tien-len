@@ -2,18 +2,18 @@ class Lobby {
     form;
     room_list;
     user_id;
-    constructor() {
+    supabase;
+    constructor(supabase_) {
         this.initView();
-        const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
-        window.my_supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        this.supabase = supabase_;
         this.user_id = "";
+        supabase_.auth.getUser().then((data) => data.data.user?.id || data.data.user?.email);
     }
     async loadRooms() {
         if (this.room_list.isRefreshable === false) {
             return;
         }
-        const { data, error } = await window.my_supabase.schema("sm_game").from('v_get_room_info')
+        const { data, error } = await this.supabase.schema("sm_game").from('v_get_room_info')
             .select('*').returns();
         if (error) {
             window.errorHandle('Error fetching data from view:\n' + JSON.stringify(error));
@@ -30,7 +30,7 @@ class Lobby {
             window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await window.my_supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
+        const { error } = await this.supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email
         });
@@ -41,7 +41,7 @@ class Lobby {
         alert("tạo phòng thành công");
     }
     async login() {
-        const { data, error } = await window.my_supabase.auth.signInWithPassword({
+        const { data, error } = await this.supabase.auth.signInWithPassword({
             email: this.form.email.value,
             password: this.form.password.value,
         });
@@ -66,7 +66,7 @@ class Lobby {
             window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await window.my_supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
+        const { error } = await this.supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email,
             _match_id: match_id
@@ -77,14 +77,15 @@ class Lobby {
         }
         //-save some infomation
         sessionStorage.setItem("match_id", match_id.toString());
-        window.location.href = "room.html";
     }
     async initView() {
-        const lobbyTemplate = document.getElementById("lobby-html");
-        if (lobbyTemplate) {
-            document.getElementById('main-body').appendChild(lobbyTemplate.content.cloneNode(true));
-        }
-        
+        // get template for lobby
+        const lobbyTemplate = window.checkNullAndGet(document.getElementById("lobby-html"), "không tải được lobby-html");
+        // attach lobby-html into main
+        const main_body = window.checkNullAndGet(document.getElementById('main-body'), "không tìm thấy main-body tag");
+        main_body.innerText = "";
+        main_body.appendChild(lobbyTemplate.content.cloneNode(true));
+        // init view binding
         this.form = queryForm();
         this.room_list = {
             array: document.getElementById("room-list"),
@@ -111,4 +112,3 @@ function constructRoomHTMLElementString(room) {
     </tr>
     `;
 }
-

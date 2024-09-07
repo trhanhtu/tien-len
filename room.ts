@@ -21,20 +21,25 @@ class Room {
     my_id: string
     my_email: string
     my_position: number
-    my_layout: Layout
-    constructor() {
-        // get supabase
-        const supabase_str = window.checkNullAndGet<string>(
-            sessionStorage.getItem("supabase"),
-            "khởi động thất bại: không kết nối được với supabase"
-        );
-        this.supabase = JSON.parse(supabase_str);
+    my_layout!: Layout
+    constructor(supabase_: SupabaseClient) {
 
+        this.supabase = supabase_;
         //get email
         this.my_email = window.checkNullAndGet<string>(sessionStorage.getItem("email"), "không tìm thấy email");
         // get id
         this.my_id = window.checkNullAndGet<string>(sessionStorage.getItem("id"), "không tìm thấy id");
         this.my_position = -1;
+        this.init();
+        
+    }
+    init(): void {
+        // get template for room
+        const roomTemplate = window.checkNullAndGet<HTMLTemplateElement>(document.getElementById("room-html") as HTMLTemplateElement, "không tải được room-html");
+        // attach lobby-html into main
+        const main_body = window.checkNullAndGet<HTMLElement>( document.getElementById('main-body') , "không tìm thấy main-body tag");
+        main_body.innerText = "";
+        main_body.appendChild(roomTemplate.content.cloneNode(true));
 
         const directions: string[] = ["current", "right", "top", "left"];
         this.my_layout = {
@@ -46,8 +51,7 @@ class Room {
                     window.checkNullAndGet<HTMLElement>(document.getElementById(directions[index] + "-player-cards-amount"), "không tìm thấy tag bài người chơi"))
 
         }
-    }
-    init(): void {
+
         this.constructView();
     }
     async constructView() {
@@ -59,9 +63,9 @@ class Room {
         room_id_tag.innerText = window.checkNullAndGet<string>(sessionStorage.getItem("match_id"), "không tìm thấy match id");
 
         // get players in room
-        const { data, error } = await this.supabase.schema("sm_game").from("tb_match").select("*").eq("sm_game.tb_match.match_id", room_id_tag.innerText).single<MatchInfo>();
+        const { data, error } = await this.supabase.from("sm_game.tb_match").select("*").eq("sm_game.tb_match.match_id", room_id_tag.innerText).single<MatchInfo>();
         if (error) {
-            window.errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error,null,2));
+            window.errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error, null, 2));
             return;
         }
         // assign seat for players
@@ -79,17 +83,14 @@ class Room {
             // no need to shift because it already in bottom
             return;
         }
-        rotateArray(this.my_layout.player_cards_amount,4 - this.my_position);
-        rotateArray(this.my_layout.player_emails,4 - this.my_position);
-        
-
+        this.my_layout.player_cards_amount = rotateArray(this.my_layout.player_cards_amount, 4 - this.my_position);
+        this.my_layout.player_emails = rotateArray(this.my_layout.player_emails, 4 - this.my_position);
     }
 }
 
-//========================== MAIN HERE ======================================//
-const app = new Room();
-app.init();
+
 //========================== HELPER FUNCTION ===============================//
-function rotateArray(arr: any[], k: number): void {
-    arr.concat(arr).slice(k, k + arr.length);
+function rotateArray(arr: any[], k: number): any[] {
+    const rotate_array = arr.concat(arr).slice(k, k + arr.length);
+    return rotate_array;
 }

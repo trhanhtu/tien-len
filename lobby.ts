@@ -1,13 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-declare global {
-    interface Window {
-        my_supabase: SupabaseClient; // Use the correct type for your Supabase client
-    }
 
-}
-declare const supabase: {
-    createClient: (supabaseUrl: string, supabaseKey: string) => SupabaseClient;
-};
 interface FormElement {
     email: HTMLInputElement,
     password: HTMLInputElement,
@@ -27,19 +19,19 @@ class Lobby {
     form!: FormElement
     room_list!: RoomList
     user_id: string
-    constructor() {
+    supabase: SupabaseClient;
+    constructor(supabase_ : SupabaseClient) {
         this.initView();
-        const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
-        window.my_supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        this.supabase = supabase_;
         this.user_id = "";
+        supabase_.auth.getUser().then((data)=> data.data.user?.id || data.data.user?.email)
     }
 
     async loadRooms(): Promise<void> {
         if (this.room_list.isRefreshable === false) {
             return;
         }
-        const { data, error } = await window.my_supabase.schema("sm_game").from('v_get_room_info')
+        const { data, error } = await this.supabase.schema("sm_game").from('v_get_room_info')
             .select('*').returns<RoomInfo[]>();
         if (error) {
             window.errorHandle('Error fetching data from view:\n' + JSON.stringify(error));
@@ -57,7 +49,7 @@ class Lobby {
             window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await window.my_supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
+        const { error } = await this.supabase.schema("sm_game").rpc("func_create_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email
         });
@@ -70,7 +62,7 @@ class Lobby {
 
     }
     async login(): Promise<void> {
-        const { data, error } = await window.my_supabase.auth.signInWithPassword({
+        const { data, error } = await this.supabase.auth.signInWithPassword({
             email: this.form.email.value,
             password: this.form.password.value,
         });
@@ -96,7 +88,7 @@ class Lobby {
             window.errorHandle("không tìm thấy ID hoặc email");
             return;
         }
-        const { error } = await window.my_supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
+        const { error } = await this.supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
             player_id: user_id,
             player_email: user_email,
             _match_id: match_id
@@ -107,13 +99,14 @@ class Lobby {
         }
         //-save some infomation
         sessionStorage.setItem("match_id", match_id.toString());
-        window.location.href = "room.html";
     }
     async initView(): Promise<void> {
         // get template for lobby
         const lobbyTemplate = window.checkNullAndGet<HTMLTemplateElement>(document.getElementById("lobby-html") as HTMLTemplateElement, "không tải được lobby-html");
         // attach lobby-html into main
-        document.getElementById('main-body')!.appendChild(lobbyTemplate.content.cloneNode(true));
+        const main_body = window.checkNullAndGet<HTMLElement>( document.getElementById('main-body') , "không tìm thấy main-body tag");
+        main_body.innerText = "";
+        main_body.appendChild(lobbyTemplate.content.cloneNode(true));
         // init view binding
         this.form = queryForm();
         this.room_list = {

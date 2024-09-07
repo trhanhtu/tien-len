@@ -21,13 +21,14 @@ CREATE TABLE sm_game.tb_match (
     attack_type SMALLINT DEFAULT 0 NOT NULL,
     score INTEGER DEFAULT 0 NOT NULL,
     who_turn SMALLINT DEFAULT 0 NOT NULL,
-    players_id_array UUID[] NOT NULL CHECK (array_length(players_id_array, 1) <= 4), 
-    players_email_array VARCHAR(100)[] NOT NULL CHECK (array_length(players_email_array, 1) <= 4), 
+    players_id_array UUID[] NOT NULL DEFAULT '{}' CHECK (array_length(players_id_array, 1) <= 4), 
+    players_email_array VARCHAR(100)[] NOT NULL DEFAULT '{}' CHECK (array_length(players_email_array, 1) <= 4), 
     players_cards_array SMALLINT[] DEFAULT '{-1,-1,-1,-1}' NOT NULL CHECK (array_length(players_cards_array, 1) <= 4), 
-    players_state_array CHAR(3)[] NOT NULL DEFAULT '{"ide","out", "out", "out"}' CHECK (array_length(players_state_array, 1) <= 4), players_ping_array SMALLINT[] DEFAULT '{0,0,0,0}' NOT NULL CHECK (array_length(players_ping_array, 1) <= 4));
+    players_state_array CHAR(3)[] NOT NULL DEFAULT '{"ide","out", "out", "out"}' CHECK (array_length(players_state_array, 1) <= 4),
+    players_ping_array SMALLINT[] DEFAULT '{0,0,0,0}' NOT NULL CHECK (array_length(players_ping_array, 1) <= 4));
 
 
-CREATE OR REPLACE FUNCTION sm_game.create_player_on_auth_insert() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION sm_game.create_player_on_auth_insert() RETURNS TRIGGER set search_path = '' AS $$
 BEGIN
 RAISE LOG 'Current user: %', current_user;
     INSERT INTO sm_game.tb_players (id, email)
@@ -48,7 +49,7 @@ ALTER TABLE sm_game.tb_players ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY select_own_player ON sm_game.tb_players
 FOR
-SELECT USING (auth.uid() = id);
+SELECT USING ((SELECT auth.uid()) = id);
 
 -- Create a policy for INSERT operations with a WITH CHECK condition
 -- Update policy for players table
@@ -88,7 +89,7 @@ GRANT
 SELECT ON sm_game.v_get_room_info TO authenticated;
 
 
-CREATE OR REPLACE FUNCTION sm_game.func_create_match_if_not_in_any(player_id UUID, player_email VARCHAR(100)) RETURNS VOID set search_path = 'sm_game' AS $$
+CREATE OR REPLACE FUNCTION sm_game.func_create_match_if_not_in_any(player_id UUID, player_email VARCHAR(100)) RETURNS VOID set search_path = '' AS $$
 BEGIN
     -- Check if the player is already in a match
     IF NOT EXISTS (
@@ -103,8 +104,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION sm_game.func_exit_match_if_in_any(_match_id INT, player_id UUID, player_email VARCHAR(100)) 
+RETURNS VOID 
+SET search_path = '' 
+AS $$
+BEGIN
+    -- Check if the player is in the specified match
+    IF EXISTS (
+        SELECT 1 
+        FROM sm_game.tb_match 
+        WHERE match_id = _match_id
+        AND player_id = ANY(players_id_array)
+    ) THEN
+        -- Remove the player from the match
+        UPDATE sm_game.tb_match
+        SET players_id_array = array_remove(players_id_array, player_id),
+            players_email_array = array_remove(players_email_array, player_email)
+        WHERE match_id = _match_id;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION sm_game.func_join_match_if_not_in_any(player_id UUID, player_email VARCHAR(100), _match_id INT) RETURNS VOID set search_path = 'sm_game' AS $$
+
+CREATE OR REPLACE FUNCTION sm_game.func_join_match_if_not_in_any(player_id UUID, player_email VARCHAR(100), _match_id INT) RETURNS VOID set search_path = '' AS $$
 BEGIN
     -- Check if the player is already in a match
     IF NOT EXISTS (
@@ -139,5 +161,3 @@ GRANT ALL PRIVILEGES ON TABLE sm_game.tb_match TO authenticated;
 
 GRANT USAGE,
 SELECT ON SEQUENCE sm_game.tb_match_match_id_seq TO authenticated;
-
--- select * from sm_game.v_get_room_info;

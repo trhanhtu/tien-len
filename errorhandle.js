@@ -2,6 +2,7 @@
 function errorHandle(message) {
     sessionStorage.setItem("error", message);
     window.location.href = "error.html";
+    exitRoom();
 }
 function checkNullAndGet(value, error_message) {
     if (!value) {
