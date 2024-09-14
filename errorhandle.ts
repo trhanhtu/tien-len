@@ -2,8 +2,8 @@ declare function exitRoom():Promise<void>
 
 function errorHandle(message: string): void {
     sessionStorage.setItem("error", message);
-    window.location.href = "error.html";
     exitRoom();
+    window.location.href = "error.html";
 }
 
 function checkNullAndGet<T>(value: T | null, error_message: string): T {

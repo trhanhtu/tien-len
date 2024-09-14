@@ -35,13 +35,40 @@
 4   số bài còn lại của người 4 (0xe == sẵn sàng) (0x00 == thắng)
 
 00000000_00_00_00_00_0000_0000_0000_0000
-00000000_01_00_00_00_1111_1111_1111_1111
+
 
 ide,out,out,out,-1,-1,-1,-1
 out
-ide_
-pas_
+pas_ 01
 now_
-win
+ide 0xe
+win 0x0
 
-người 
+000_000_ 00_ 01_ 00_ 00_ 00_ 1111_1111_1111_1111
+    [10] [9] [8] [7] [6] [5] [4]  [3]  [2]  [1]
+
+loại tấn công --> 10 (không , đơn , đôi , ba , tứ , sảnh ,đôi thông)
+lượt của ai --> [9]
+người chơi đang chờ chủ phòng bắt đầu --> [1] [2] [3] [4] == 0xe
+người chơi nào đó thắng -->  [1] [2] [3] [4] == 0000
+người chơi nào đó bỏ lượt --> [5] [6] [7] [8] == 11
+người chơi nào đó ngồi xem trận đấu đang diễn ra --> [5] [6] [7] [8] == 10
+người chơi nào đó thoát trận --> [5] [6] [7] [8] == 10
+người chơi thoát / vị trí trống --> [5] [6] [7] [8] == 00
+
+ur1@tienlen.com;
+ur2@tienlen.com;
+ur3@tienlen.com;
+ur4@tienlen.com;
+status;
+score;card,card,card,
+
+match_broadcast
+id | command
+
+match_detail
+id | status | score | array of cards 
+
+match_hearbeat
+id | player | ping 
+               |-> hỏi 3 đâu sao không thấy --> coi như bỏ lượt đó --> kiểm tra có xem lần tương tác cuối cùng cách hiện tại ==vắng lần 2 --> thoát phòng

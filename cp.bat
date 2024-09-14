@@ -1,0 +1,1 @@
+tsc & py docu.py

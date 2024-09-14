@@ -26,14 +26,14 @@ body {
     background-color: aqua;
     text-align: center;
     align-content: center;
-    font-size: 30px;
+    font-size: 10px;
 }
 
 .top-player-area {
     grid-area: top-player-area;
     background-color: bisque;
     text-align: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .setting-area {
@@ -41,14 +41,14 @@ body {
     background-color: cadetblue;
     text-align: center;
     align-content: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .left-player-area {
     grid-area: left-player-area;
     background-color: chartreuse;
     align-content: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .main-desk {
@@ -66,7 +66,7 @@ body {
     background-color: cornflowerblue;
     text-align: end;
     align-content: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .create-new-room-btn {
@@ -140,6 +140,8 @@ body {
     height: 50px;
     width: auto;
     aspect-ratio: 1/1;
+    display: none;
+
 }
 
 .player-name {

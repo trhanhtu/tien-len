@@ -21,7 +21,7 @@ async function exitRoom() {
         player_id: data.user?.id,
         player_email: data.user?.email,
     });
-    window.close();
+    // window.close();
 }
 async function userEnterRoom(room_id) {
     await page.enterRoom(room_id);
