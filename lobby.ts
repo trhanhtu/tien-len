@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 interface FormElement {
     email: HTMLInputElement,
@@ -15,22 +15,18 @@ interface RoomInfo {
     email: string,
     player_count: number
 }
-
 class Lobby {
-    form: FormElement
-    supabase: SupabaseClient
-    room_list: RoomList
-    constructor() {
-        this.form = queryForm();
-        const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
-
-        this.supabase = createClient(supabaseUrl, supabaseKey);
-        this.room_list = {
-            array: document.getElementById("room-list")!,
-            isRefreshable: true
-        };
+    form!: FormElement
+    room_list!: RoomList
+    user_id: string
+    supabase: SupabaseClient;
+    constructor(supabase_ : SupabaseClient) {
+        this.initView();
+        this.supabase = supabase_;
+        this.user_id = "";
+        supabase_.auth.getUser().then((data)=> data.data.user?.id || data.data.user?.email)
     }
+
     async loadRooms(): Promise<void> {
         if (this.room_list.isRefreshable === false) {
             return;
@@ -103,28 +99,25 @@ class Lobby {
         }
         //-save some infomation
         sessionStorage.setItem("match_id", match_id.toString());
-        sessionStorage.setItem("supabase", JSON.stringify(this.supabase));
-        window.location.href = "room.html";
     }
-    // async checkIfLoggedIn() {
-    //     const { data, error } = await this.supabase.auth.getSession()
-
-    //     if (error) {
-    //         window.errorHandle('Error getting session:'+ error.)
-    //         return;
-    //     }
-
-    //     if (data.session) {
-    //         console.log('User is logged in:', data.session.user)
-    //     } else {
-    //         console.log('User is not logged in.')
-    //     }
-    // }
+    async initView(): Promise<void> {
+        // get template for lobby
+        const lobbyTemplate = window.checkNullAndGet<HTMLTemplateElement>(document.getElementById("lobby-html") as HTMLTemplateElement, "không tải được lobby-html");
+        // attach lobby-html into main
+        const main_body = window.checkNullAndGet<HTMLElement>( document.getElementById('main-body') , "không tìm thấy main-body tag");
+        main_body.innerText = "";
+        main_body.appendChild(lobbyTemplate.content.cloneNode(true));
+        // init view binding
+        this.form = queryForm();
+        this.room_list = {
+            array: document.getElementById("room-list")!,
+            isRefreshable: true
+        };
+    }
 }
-
-//========================== MAIN HERE ======================================//
-const app_lobby = new Lobby();
 //========================== HELPER FUNCTION ===============================//
+
+
 function queryForm(): FormElement {
     const email_input = document.getElementById("email-input")! as HTMLInputElement;
     const password_input = document.getElementById("password-input")! as HTMLInputElement;
@@ -136,7 +129,7 @@ function constructRoomHTMLElementString(room: RoomInfo): string {
     return `
     <tr>
         <td colspan="3">
-            <button class="button-room"  onclick="app_lobby.enterRoom(${room.match_id})">
+            <button class="button-room"  onclick="userEnterRoom(${room.match_id});">
                 <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
                 <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
                 <p style="text-align: center;">tiến lên</p>

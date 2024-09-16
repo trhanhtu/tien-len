@@ -1,0 +1,78 @@
+<div class="lobby">
+    <div class="login-left-side">
+        <h1 style="text-align: center;">Đăng nhập</h1>
+        <table>
+            <tr>
+                <td>
+                    <label for="email-input">email</label>
+                </td>
+                <td>
+                    <input value="user1@tienlen.com" autocomplete="email" id="email-input" type="email" name="email">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="password-input">mật khẩu</label>
+                </td>
+                <td>
+                    <input value="12345678aA@" autocomplete="current-password" id="password-input" type="text" name="password">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <button onclick="page.login()">Đăng Nhập</button>
+                </td>
+
+            </tr>
+        </table>
+        <p>user1@tienlen.com</p>
+        <p>12345678aA@</p>
+    </div>
+    <div class="room-right-side">
+        <div>
+            <button class="create-new-room-btn" onclick="this.disabled = true;page.createRoom()">+</button>
+            <button class="create-new-room-btn" onclick="this.disabled = true;page.createRoom()">tải lại</button>
+        </div>
+        <table  style="width: 100%;">
+            <thead style="height: 30px;background-color: salmon;">
+                <th style="text-align: center;">chủ phòng</th>
+                <th style="text-align: center;">số người</th>
+                <th style="text-align: center;">chế độ</th>
+            </thead>
+            <tbody id="room-list">
+                <!-- danh sách phòng ở đây -->
+                <tr>
+                    <td colspan="3">
+                        <button class="button-room">
+                             
+                            <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                            <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
+                            <p style="text-align: center;">tiến lên</p>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button class="button-room">
+                             
+                            <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                            <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
+                            <p style="text-align: center;">tiến lên</p>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button class="button-room">
+                            <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                            <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
+                            <p style="text-align: center;">tiến lên</p>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+</div>

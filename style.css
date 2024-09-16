@@ -26,14 +26,14 @@ body {
     background-color: aqua;
     text-align: center;
     align-content: center;
-    font-size: 30px;
+    font-size: 10px;
 }
 
 .top-player-area {
     grid-area: top-player-area;
     background-color: bisque;
     text-align: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .setting-area {
@@ -41,14 +41,14 @@ body {
     background-color: cadetblue;
     text-align: center;
     align-content: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .left-player-area {
     grid-area: left-player-area;
     background-color: chartreuse;
     align-content: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .main-desk {
@@ -66,7 +66,7 @@ body {
     background-color: cornflowerblue;
     text-align: end;
     align-content: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .create-new-room-btn {
@@ -79,6 +79,23 @@ body {
 .chat-area {
     grid-area: chat-area;
     background-color: cornsilk;
+}
+
+.chat-area>iframe {
+    width: 90%;
+    height: 60%;
+    resize: none;
+}
+
+.chat-area > input{
+    height: 20%;
+    width: 70%;
+}
+
+.chat-area > button{
+    height: 20%;
+    width: 20%;
+
 }
 
 .current-player-area {
@@ -140,6 +157,8 @@ body {
     height: 50px;
     width: auto;
     aspect-ratio: 1/1;
+    display: none;
+
 }
 
 .player-name {
@@ -165,6 +184,7 @@ body {
     width: 100%;
     display: flex;
     justify-content: space-around;
+
     &:hover {
         background-image: url("https://store-images.s-microsoft.com/image/apps.36340.13930766332958392.910195fd-d16a-4529-9806-8d70ff1aeaa7.f7b20b98-b5b5-47b7-99d9-48be58d201b0"), linear-gradient(-45deg, #BBE44D, #caed6b, #def4a1, #f2f9de);
         background-repeat: no-repeat;

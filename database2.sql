@@ -4,14 +4,11 @@ DROP SCHEMA IF EXISTS sm_game CASCADE;
 CREATE SCHEMA sm_game;
 
 
-ALTER ROLE ro_player
-SET search_path = sm_game;
-
 -- Table for players
 
 CREATE TABLE sm_game.tb_player_cards (
 email VARCHAR(100) NOT NULL auth.users.email PRIMARY KEY,
-cards INTEGER[] NOT NULL DEFAULT '{}');
+cards SMALLINT[] NOT NULL DEFAULT '{}');
 
 -- Table for matches
 
@@ -23,11 +20,14 @@ who_turn SMALLINT DEFAULT 0 NOT NULL,
 players_email_array VARCHAR(100)[] NOT NULL DEFAULT '{}' CHECK (array_length(players_email_array, 1) <= 4),
 players_state_array CHAR(3)[] NOT NULL DEFAULT '{"ide","out", "out", "out"}' CHECK (array_length(players_state_array, 1) <= 4),
 
+CREATE TABLE sm_game.tb_match_broadcast(
+    match_id INTEGER NOT NULL REFERENCES sm.tb_match(match_id),
+    command TEXT NOT NULL DEFAULT 'new'
+)
 
 CREATE OR REPLACE FUNCTION sm_game.create_player_on_auth_insert() RETURNS TRIGGER
 set search_path = '' AS $$
 BEGIN
-RAISE LOG 'Current user: %', current_user;
     INSERT INTO sm_game.tb_player_cards (email)
     VALUES (NEW.email);
     RETURN NEW;
@@ -122,11 +122,16 @@ BEGIN
         SET players_email_array = ARRAY[player_email], 
             players_state_array = ARRAY['ide','out','out','out'] 
         WHERE match_id = _room_id_value;
+
+        UPDATE sm_game.tb_match_broadcast
+        SET command = 'new'
     ELSE
         -- Create a new match and add the player
         INSERT INTO sm_game.tb_match (players_email_array, players_state_array)
         VALUES (ARRAY[player_email], ARRAY['ide','out','out','out'])
         RETURNING match_id INTO _room_id_value;
+
+        INSERT INTO sm_game.tb_match_broadcast(match_id) VALUES (_room_id_value)
     END IF;
 
     RETURN _room_id_value; -- Return the match ID (either existing or new)
@@ -175,7 +180,7 @@ BEGIN
             players_email_array = array_append(players_email_array, player_email)
         WHERE match_id = _match_id;
     ELSE
-        RAISE NOTICE 'Player is already in a match';
+        RAISE ERROR 'Player is already in a match';
     END IF;
 END;
 $$ LANGUAGE plpgsql;

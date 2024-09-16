@@ -1,6 +1,7 @@
 "use strict";
 function errorHandle(message) {
     sessionStorage.setItem("error", message);
+    exitRoom();
     window.location.href = "error.html";
 }
 function checkNullAndGet(value, error_message) {

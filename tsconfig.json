@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "module": "esnext",             
     "moduleResolution": "node",
     "target": "esnext",
     "lib": ["esnext", "dom"],
     "strict": true
   },
-  "exclude": ["node_modules" , "card_game"]
+  "exclude": ["node_modules", "card_game"]
 }

@@ -1,36 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fetch Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
+
 <body>
     <h1>Fetch Content Example</h1>
+    <button onclick="exitRoom()">exit</button>
+    <button onclick="testleaveEvent(1)">login 1</button>
+    <button onclick="testleaveEvent(2)">login 2</button>
     <p id="content-placeholder">Loading content...</p>
-    
+
     <script>
-        async function loadContent() {
-            try {
-                // Raw URL of the file from GitHub
-                const response = await fetch('https://raw.githubusercontent.com/trhanhtu/tien-len/main/index.html');
-                
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                
-                const htmlContent = await response.text();
-                
-                // Insert the fetched HTML content into the <p> element
-                document.getElementById('content-placeholder').innerHTML = htmlContent;
-            } catch (error) {
-                console.error('Error fetching content:', error);
-                document.getElementById('content-placeholder').innerText = 'Failed to load content.';
+        const match_id = 1;
+        var channel = null;
+        var roomOne = null;
+        var logElement = document.getElementById("content-placeholder");
+        document.addEventListener('DOMContentLoaded', async function () {
+            const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
+            const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
+            my_supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+            // await login();
+            // await listenEvent();
+            // await enterRoom();
+            // await getInfo();
+            // await addRealTime();
+            document.addEventListener('beforeunload',await untrackPresence());
+        })
+        
+
+        async function listenEvent() {
+            const email = sessionStorage.getItem("email");
+            roomOne = my_supabase.channel('room_01', {
+                config: {
+                    presence: {
+                        key: email,
+                    },
+                },
+            })
+
+
+            const userStatus = {
+                user: email
             }
+
+            roomOne
+                .on('presence', { event: 'sync' }, () => {
+                    const newState = roomOne.presence.presence.pendingDiffs[0];
+                    logElement.innerHTML += '-->sync ' + " " + JSON.stringify(Object.keys(newState)) + "<br>";
+                })
+                // .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+                //     logElement.innerHTML += 'join ' + key + " " + newPresences + "<br>";
+                // })
+                // .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+                //     logElement.innerHTML += 'leave ' + key + " " + leftPresences + "<br>";
+                // })
+                .subscribe(
+                async (status) => {
+                    if (status !== 'SUBSCRIBED') { return }
+
+                    const presenceTrackStatus = await roomOne.track()
+                    logElement.innerHTML += "==>track" + JSON.stringify(presenceTrackStatus) + "<br>"
+                })
+
+
         }
 
-        // Load content on page load
-        loadContent();
+        async function untrackPresence() {
+            if(roomOne){
+                const presenceUntrackStatus = await roomOne.untrack()
+            }
+            
+        }
+
+
+        async function testleaveEvent(id) {
+            await loginById(id);
+            await listenEvent();
+        }
+        async function getInfo() {
+
+            const { data, error } = await my_supabase.schema("sm_game").from("tb_match").select("*").eq("match_id", match_id).limit(1);
+            if (error) {
+                window.errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error, null, 2));
+                return;
+            }
+            document.getElementById("content-placeholder").innerText = JSON.stringify(data);
+        }
+        async function loginById(id) {
+            const { data, error } = await my_supabase.auth.signInWithPassword({
+                email: "user" + id + "@tienlen.com",
+                password: "12345678aA@",
+            });
+            if (error) {
+                window.errorHandle('Error signing in:' + error.message);
+                return;
+            }
+            const user_id = data.user?.id;
+            const user_email = data.user?.email;
+            sessionStorage.setItem("id", user_id);
+            sessionStorage.setItem("email", user_email);
+            logElement.innerHTML = "đăng nhập bằng " + id + "<br>";
+        }
+        async function login() {
+            const { data, error } = await my_supabase.auth.signInWithPassword({
+                email: "user2@tienlen.com",
+                password: "12345678aA@",
+            });
+            if (error) {
+                window.errorHandle('Error signing in:' + error.message);
+                return;
+            }
+            const user_id = data.user?.id;
+            const user_email = data.user?.email;
+            sessionStorage.setItem("id", user_id);
+            sessionStorage.setItem("email", user_email);
+
+        }
+        async function enterRoom() {
+            const user_id = sessionStorage.getItem("id");
+            const user_email = sessionStorage.getItem("email");
+            if (!user_id || !user_email) {
+                window.errorHandle("không tìm thấy ID hoặc email");
+                return;
+            }
+            const { error } = await my_supabase.schema("sm_game").rpc("func_join_match_if_not_in_any", {
+                player_id: user_id,
+                player_email: user_email,
+                _match_id: match_id
+            });
+            if (error) {
+                window.errorHandle("không vào được phòng:\n" + JSON.stringify(error));
+                return;
+            }
+            //-save some infomation
+            sessionStorage.setItem("match_id", match_id.toString());
+        }
+        async function exitRoom() {
+            if (!my_supabase) {
+                return;
+            }
+            const match_id = sessionStorage.getItem("match_id");
+            if (!match_id) {
+                return;
+            }
+            const { data } = await my_supabase.auth.getUser();
+            const { error } = await my_supabase.schema("sm_game").rpc("func_exit_match_if_in_any", {
+                _match_id: match_id,
+                player_id: data.user?.id,
+                player_email: data.user?.email,
+            });
+            alert("exit account");
+        }
+        async function addRealTime() {
+            channel = my_supabase.channel("room_change").on("postgres_changes", { event: "*", schema: "sm_game", table: "tb_match" }, (payload) => {
+                console.log(payload);
+            }).subscribe();
+        }
     </script>
 </body>
+
 </html>

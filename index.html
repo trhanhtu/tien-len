@@ -9,90 +9,228 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="errorhandle.js" defer></script>
     <script src="lobby.js" defer></script>
+    <script src="room.js" defer></script>
 </head>
 
 <body>
-    <div class="lobby">
-        <div class="login-left-side">
-            <h1 style="text-align: center;">Đăng nhập</h1>
-            <table>
-                <tr>
-                    <td>
-                        <label for="email-input">email</label>
-                    </td>
-                    <td>
-                        <input value="user1@tienlen.com" autocomplete="email" id="email-input" type="email" name="email">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="password-input">mật khẩu</label>
-                    </td>
-                    <td>
-                        <input value="12345678aA@" autocomplete="current-password" id="password-input" type="text" name="password">
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align: center;">
-                        <button onclick="app_lobby.login()">Đăng Nhập</button>
-                    </td>
+    <main id="main-body">
 
-                </tr>
-            </table>
-            <p>user1@tienlen.com</p>
-            <p>12345678aA@</p>
-        </div>
-        <div class="room-right-side">
-            <div>
-                <button class="create-new-room-btn" onclick="this.disabled = true;app_lobby.createRoom()">+</button>
-                <button class="create-new-room-btn" onclick="this.disabled = true;app_lobby.createRoom()">tải lại</button>
+    </main>
+    <script src="index.js" defer>
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+    <!-- ========================================= PAGE CLONE AREA ========================================= -->
+    <!-- ------------------------------------------ lobby ------------------------------------------ -->
+    <template id="lobby-html">
+        <div class="lobby">
+            <div class="login-left-side">
+                <h1 style="text-align: center;">Đăng nhập</h1>
+                <table>
+                    <tr>
+                        <td>
+                            <label for="email-input">email</label>
+                        </td>
+                        <td>
+                            <input value="user1@tienlen.com" autocomplete="email" id="email-input" type="email"
+                                name="email">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="password-input">mật khẩu</label>
+                        </td>
+                        <td>
+                            <input value="12345678aA@" autocomplete="current-password" id="password-input" type="text"
+                                name="password">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <button onclick="page.login()">Đăng Nhập</button>
+                        </td>
+
+                    </tr>
+                </table>
+                <p>user1@tienlen.com</p>
+                <p>12345678aA@</p>
             </div>
-            <table  style="width: 100%;">
-                <thead style="height: 30px;background-color: salmon;">
-                    <th style="text-align: center;">chủ phòng</th>
-                    <th style="text-align: center;">số người</th>
-                    <th style="text-align: center;">chế độ</th>
-                </thead>
-                <tbody id="room-list">
-                    <!-- danh sách phòng ở đây -->
-                    <tr>
-                        <td colspan="3">
-                            <button class="button-room">
-                                 
-                                <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
-                                <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
-                                <p style="text-align: center;">tiến lên</p>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <button class="button-room">
-                                 
-                                <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
-                                <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
-                                <p style="text-align: center;">tiến lên</p>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <button class="button-room">
-                                 
-                                <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
-                                <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
-                                <p style="text-align: center;">tiến lên</p>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
+            <div class="room-right-side">
+                <div>
+                    <button class="create-new-room-btn" onclick="this.disabled = true;page.createRoom()">+</button>
+                    <button class="create-new-room-btn" onclick="this.disabled = true;page.createRoom()">tải
+                        lại</button>
+                </div>
+                <table style="width: 100%;">
+                    <thead style="height: 30px;background-color: salmon;">
+                        <th style="text-align: center;">chủ phòng</th>
+                        <th style="text-align: center;">số người</th>
+                        <th style="text-align: center;">chế độ</th>
+                    </thead>
+                    <tbody id="room-list">
+                        <!-- danh sách phòng ở đây -->
+                        <tr>
+                            <td colspan="3">
+                                <button class="button-room">
 
-            </table>
+                                    <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                                    <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4
+                                    </p>
+                                    <p style="text-align: center;">tiến lên</p>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button class="button-room">
 
+                                    <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                                    <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4
+                                    </p>
+                                    <p style="text-align: center;">tiến lên</p>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button class="button-room">
+                                    <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
+                                    <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4
+                                    </p>
+                                    <p style="text-align: center;">tiến lên</p>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
         </div>
+    </template>
 
 
-    </div>
+
+
+    <!-- ------------------------------------------ room ------------------------------------------- -->
+
+
+
+
+    <template id="room-html">
+        <div class="app">
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="info-tab">
+                <p id="match-id"><b>ID phòng:</b></p>
+                <img id="current-player-image" class="player-avatar" loading>
+                <p style="font-size: 10px;" id="current-player-name"></p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="top-player-area">
+                <span>
+                    <img id="top-player-image" class="player-avatar" loading>
+
+                    <p id="top-player-cards-amount" style="display: contents;">13</p>
+                </span>
+                <p id="top-player-name" class="player-name"></p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="setting-area">setting
+                <button onclick="exitRoom();">Rời phòng</button>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="left-player-area">
+                <span>
+                    <img id="left-player-image" class="player-avatar" loading>
+
+                    <p id="left-player-cards-amount" style="display: contents;">13</p>
+                </span>
+                <p id="left-player-name" class="player-name"></p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="main-desk">
+                <div id="main-desk-cards-container" class="card-on-desk-container">
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                    <span class="card-on-main-desk"></span>
+                </div>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="right-player-area">
+                <span>
+                    <img id="right-player-image" class="player-avatar" loading>
+
+                    <p id="right-player-cards-amount" style="display: contents;">13</p>
+                </span>
+                <p id="right-player-name" class="player-name"></p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="chat-area"> 
+                <iframe id="text-area" readonly></iframe>
+                <input id="input-box" type="text" placeholder="xin chào ...">
+                <button onclick="page.sendMessage(this)">gửi</button>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="current-player-area">
+                <div id="current-player-card-container" class="card-container">
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(0)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(1)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(2)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(3)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(4)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(5)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(6)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(7)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(8)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(9)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(10)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(11)"></span>
+                    <span class="current-player-card" id="53" data-selected="F"
+                        onclick="page.updateCardsInReadyHand(12)"></span>
+                </div>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            <div class="controller-area">
+                <button onclick="page.sortCards()">xếp</button>
+                <button onclick="page.splittingTheDeck()">Trộn</button>
+                <button onclick="page.lauchAttack()">Đánh</button>
+                <button onclick="page.lauchAttack()">Bỏ Chọn</button>
+                <p id="current-player-cards-amount" style="display: contents;">13</p>
+            </div>
+            <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+        </div>
+    </template>
 </body>
 
 </html>

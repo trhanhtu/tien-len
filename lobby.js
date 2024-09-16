@@ -1,17 +1,13 @@
-
 class Lobby {
     form;
-    supabase;
     room_list;
-    constructor() {
-        this.form = queryForm();
-        const supabaseUrl = "https://pvspechosfvvqcgoqxkt.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2c3BlY2hvc2Z2dnFjZ29xeGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMjI3NjAsImV4cCI6MjAzOTY5ODc2MH0.g6euO8ybVeiDCuGtDX6XjIxzROIM8SeyKR5qIhqykc8";
-        this.supabase = supabase.createClient(supabaseUrl, supabaseKey);
-        this.room_list = {
-            array: document.getElementById("room-list"),
-            isRefreshable: true
-        };
+    user_id;
+    supabase;
+    constructor(supabase_) {
+        this.initView();
+        this.supabase = supabase_;
+        this.user_id = "";
+        supabase_.auth.getUser().then((data) => data.data.user?.id || data.data.user?.email);
     }
     async loadRooms() {
         if (this.room_list.isRefreshable === false) {
@@ -81,12 +77,22 @@ class Lobby {
         }
         //-save some infomation
         sessionStorage.setItem("match_id", match_id.toString());
-        sessionStorage.setItem("supabase", JSON.stringify(this.supabase));
-        window.location.href = "room.html";
+    }
+    async initView() {
+        // get template for lobby
+        const lobbyTemplate = window.checkNullAndGet(document.getElementById("lobby-html"), "không tải được lobby-html");
+        // attach lobby-html into main
+        const main_body = window.checkNullAndGet(document.getElementById('main-body'), "không tìm thấy main-body tag");
+        main_body.innerText = "";
+        main_body.appendChild(lobbyTemplate.content.cloneNode(true));
+        // init view binding
+        this.form = queryForm();
+        this.room_list = {
+            array: document.getElementById("room-list"),
+            isRefreshable: true
+        };
     }
 }
-//========================== MAIN HERE ======================================//
-const app_lobby = new Lobby();
 //========================== HELPER FUNCTION ===============================//
 function queryForm() {
     const email_input = document.getElementById("email-input");
@@ -97,7 +103,7 @@ function constructRoomHTMLElementString(room) {
     return `
     <tr>
         <td colspan="3">
-            <button class="button-room"  onclick="app_lobby.enterRoom(${room.match_id})">
+            <button class="button-room"  onclick="userEnterRoom(${room.match_id});">
                 <p id="captain-name-${room.match_id}" style="text-align: center;">${room.email}</p>
                 <p id="amount-${room.match_id}" style="text-align: center;">${room.player_count}/4</p>
                 <p style="text-align: center;">tiến lên</p>
