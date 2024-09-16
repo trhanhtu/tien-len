@@ -4,8 +4,7 @@ class Room {
     my_email;
     my_position;
     my_layout;
-    room_id_value = -1;
-    channel;
+    match_data;
     room_door_event;
     room_chat_event;
     chat_box;
@@ -17,7 +16,8 @@ class Room {
         // get id
         this.my_id = window.checkNullAndGet(sessionStorage.getItem("id"), "không tìm thấy id");
         sessionStorage.removeItem("id");
-        this.room_id_value = window.checkNullAndGet(Number(sessionStorage.getItem("match_id")), "không tìm thấy id");
+        this.match_data = { room_id_value: -1, players_email_array: ["", "", "", ""] };
+        this.match_data.room_id_value = window.checkNullAndGet(Number(sessionStorage.getItem("match_id")), "không tìm thấy id");
         sessionStorage.removeItem("match_id");
         this.my_position = -1;
         this.init();
@@ -39,7 +39,7 @@ class Room {
     }
     async addRealTime() {
         // listen to player in/out room
-        this.room_door_event = this.supabase.channel(this.room_id_value.toString() + "p", {
+        this.room_door_event = this.supabase.channel(this.match_data.room_id_value.toString() + "p", {
             config: {
                 presence: {
                     key: this.my_email,
@@ -50,11 +50,11 @@ class Room {
             event: 'sync'
         }, () => {
             console.log(JSON.stringify(this.room_door_event.presenceState()));
-            const players_email_array = Object.keys(this.room_door_event.presenceState());
+            this.match_data.players_email_array = Object.keys(this.room_door_event.presenceState());
             this.my_layout.player_emails.forEach((element, index) => {
-                element.innerText = players_email_array[index] || "";
+                element.innerText = this.match_data.players_email_array[index] || "";
             });
-            this.DrawPlayerOnScreen(players_email_array);
+            this.DrawPlayerOnScreen();
         })
             .subscribe(async (status) => {
             if (status !== 'SUBSCRIBED') {
@@ -70,16 +70,18 @@ class Room {
             this.supabase.removeAllChannels();
         });
         // listen to player message chat
-        this.room_chat_event = this.supabase.channel(this.room_id_value.toString() + "b");
+        this.room_chat_event = this.supabase.channel(this.match_data.room_id_value.toString() + "b");
         this.room_chat_event.on('broadcast', { event: 'test' }, (payload) => this.receiveMessage(payload))
             .subscribe();
     }
     receiveMessage(a) {
         const [sender, text] = a.payload.message.split(":", 2);
+        const color = ["red", "violet", "black", "cornflower"];
+        const index = this.match_data.players_email_array.indexOf(sender);
         this.chat_box.textArea.srcdoc +=
             `
         <p>
-        <b style="color:red;">${sender}:</b>
+        <b style="color:${color.at(index)};">${sender}:</b>
         ${text}
         </p>`;
     }
@@ -87,15 +89,15 @@ class Room {
         if (!this.room_door_event.presenceState()) {
             return;
         }
-        const players_email_array = Object.keys(this.room_door_event.presenceState());
-        this.DrawPlayerOnScreen(players_email_array);
+        this.match_data.players_email_array = Object.keys(this.room_door_event.presenceState());
+        this.DrawPlayerOnScreen();
     }
     async sendMessage(btn) {
         try {
             // Disable the button to prevent multiple sends
             btn.disabled = true;
             // Send the message using Supabase Realtime's broadcast channel
-            await this.supabase.channel(this.room_id_value.toString() + "b").send({
+            await this.supabase.channel(this.match_data.room_id_value.toString() + "b").send({
                 type: 'broadcast',
                 event: 'test',
                 payload: { message: this.my_email + ": " + this.chat_box.input.value }
@@ -118,9 +120,9 @@ class Room {
         my_name.innerText = this.my_email;
         // get room id
         const room_id_tag = window.checkNullAndGet(document.getElementById("match-id"), "không tìm thấy tag id = match-id");
-        room_id_tag.innerText += this.room_id_value;
+        room_id_tag.innerText += this.match_data.room_id_value;
         // get players in room
-        const { data, error } = await this.supabase.schema("sm_game").from("tb_match").select("*").eq("match_id", this.room_id_value).single();
+        const { data, error } = await this.supabase.schema("sm_game").from("tb_match").select("*").eq("match_id", this.match_data.room_id_value).single();
         if (error) {
             window.errorHandle("lỗi khi tìm player khác:\n" + JSON.stringify(error, null, 2));
             return;
@@ -134,8 +136,8 @@ class Room {
             player_avatars: Array.from({ length: 4 }, (_, index) => window.checkNullAndGet(document.getElementById(directions[index] + "-player-image"), "không tìm thấy tag ảnh"))
         };
     }
-    DrawPlayerOnScreen(players_email) {
-        this.my_position = players_email.indexOf(this.my_email);
+    DrawPlayerOnScreen() {
+        this.my_position = this.match_data.players_email_array.indexOf(this.my_email);
         if (this.my_position === -1) {
             // window.errorHandle("vị trí của người chơi trong mảng không hợp lệ");
             return;
@@ -155,9 +157,9 @@ class Room {
         ];
         for (let i = 0; i < 4; i++) {
             this.my_layout.player_avatars[i].src = image_links[i];
-            if (i < players_email.length) {
+            if (i < this.match_data.players_email_array.length) {
                 this.my_layout.player_avatars[i].style.display = "block";
-                this.my_layout.player_emails[i].innerText = players_email[i];
+                this.my_layout.player_emails[i].innerText = this.match_data.players_email_array[i];
             }
             else {
                 this.my_layout.player_avatars[i].style.display = "none";
