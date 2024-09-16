@@ -6,7 +6,9 @@ class Room {
     my_layout;
     room_id_value = -1;
     channel;
-    room;
+    room_door_event;
+    room_chat_event;
+    chat_box;
     constructor(supabase_) {
         this.supabase = supabase_;
         //get email
@@ -27,36 +29,28 @@ class Room {
         const main_body = window.checkNullAndGet(document.getElementById('main-body'), "không tìm thấy main-body tag");
         main_body.innerText = "";
         main_body.appendChild(roomTemplate.content.cloneNode(true));
+        this.chat_box = {
+            input: window.checkNullAndGet(document.getElementById("input-box"), "không tìm thấy tag input"),
+            textArea: window.checkNullAndGet(document.getElementById("text-area"), "không tìm thấy tag text-area"),
+        };
         this.resetRotate();
         this.addRealTime();
         this.constructView();
     }
     async addRealTime() {
-        // this.channel = this.supabase
-        //     .channel("room_change")
-        //     .on("postgres_changes",
-        //         {
-        //             event: "*",
-        //             schema: "sm_game",
-        //             table: "tb_match",
-        //             filter: `match_id=eq.${this.room_id_value}`
-        //         },
-        //         (payload) => {
-        //             console.log(payload);
-        //         }).subscribe();
         // listen to player in/out room
-        this.room = this.supabase.channel(this.room_id_value.toString(), {
+        this.room_door_event = this.supabase.channel(this.room_id_value.toString() + "p", {
             config: {
                 presence: {
                     key: this.my_email,
                 },
             },
         });
-        this.room.on('presence', {
+        this.room_door_event.on('presence', {
             event: 'sync'
         }, () => {
-            console.log(JSON.stringify(this.room.presenceState()));
-            const players_email_array = Object.keys(this.room.presenceState());
+            console.log(JSON.stringify(this.room_door_event.presenceState()));
+            const players_email_array = Object.keys(this.room_door_event.presenceState());
             this.my_layout.player_emails.forEach((element, index) => {
                 element.innerText = players_email_array[index] || "";
             });
@@ -66,21 +60,38 @@ class Room {
             if (status !== 'SUBSCRIBED') {
                 return;
             }
-            this.room.track({});
+            this.room_door_event.track({});
         });
         window.addEventListener('beforeunload', () => {
-            if (!this.room) {
+            if (!this.room_door_event) {
                 return;
             }
-            this.room.untrack();
+            this.room_door_event.untrack();
         });
+        // listen to player message chat
+        this.room_chat_event = this.supabase.channel(this.room_id_value.toString() + "b");
+        this.room_chat_event.on('broadcast', { event: 'test' }, (payload) => this.receiveMessage(payload))
+            .subscribe();
+    }
+    receiveMessage(a) {
+        console.log(JSON.stringify(a));
+        this.chat_box.textArea.value += a.payload.message + "\n";
     }
     handleEventEnterLeaveRoom() {
-        if (!this.room.presenceState()) {
+        if (!this.room_door_event.presenceState()) {
             return;
         }
-        const players_email_array = Object.keys(this.room.presenceState());
+        const players_email_array = Object.keys(this.room_door_event.presenceState());
         this.DrawPlayerOnScreen(players_email_array);
+    }
+    async sendMessage() {
+        // this.chat_box.textArea.value += this.chat_box.input.value + '\n';
+        await this.supabase.channel(this.room_id_value.toString() + "b").send({
+            type: 'broadcast',
+            event: 'test',
+            payload: { message: this.my_email + ": " + this.chat_box.input.value }
+        });
+        this.chat_box.input.value = "";
     }
     async constructView() {
         // get my name

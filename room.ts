@@ -11,6 +11,11 @@ interface MatchInfo {
     players_state_array: string[]
 }
 
+interface ChatElement {
+    input: HTMLInputElement,
+    textArea: HTMLTextAreaElement
+}
+
 interface Layout {
     player_emails: HTMLElement[],
     player_cards_amount: HTMLElement[],
@@ -25,7 +30,9 @@ class Room {
     my_layout!: Layout
     room_id_value: number = -1;
     channel!: RealtimeChannel
-    room!: RealtimeChannel;
+    room_door_event!: RealtimeChannel;
+    room_chat_event!: RealtimeChannel;
+    chat_box!: ChatElement;
     constructor(supabase_: SupabaseClient) {
 
         this.supabase = supabase_;
@@ -51,27 +58,21 @@ class Room {
         const main_body = window.checkNullAndGet<HTMLElement>(document.getElementById('main-body'), "không tìm thấy main-body tag");
         main_body.innerText = "";
         main_body.appendChild(roomTemplate.content.cloneNode(true));
+
+        this.chat_box = {
+            input: window.checkNullAndGet<HTMLInputElement>(document.getElementById("input-box") as HTMLInputElement, "không tìm thấy tag input"),
+            textArea: window.checkNullAndGet<HTMLTextAreaElement>(document.getElementById("text-area") as HTMLTextAreaElement, "không tìm thấy tag text-area"),
+        }
+
         this.resetRotate();
         this.addRealTime();
         this.constructView();
     }
     async addRealTime(): Promise<void> {
-        // this.channel = this.supabase
-        //     .channel("room_change")
-        //     .on("postgres_changes",
-        //         {
-        //             event: "*",
-        //             schema: "sm_game",
-        //             table: "tb_match",
-        //             filter: `match_id=eq.${this.room_id_value}`
-        //         },
-        //         (payload) => {
-        //             console.log(payload);
-        //         }).subscribe();
 
         // listen to player in/out room
-        this.room = this.supabase.channel(
-            this.room_id_value.toString(),
+        this.room_door_event = this.supabase.channel(
+            this.room_id_value.toString()+"p",
             {
                 config: {
                     presence: {
@@ -80,13 +81,13 @@ class Room {
                 },
             }
         )
-        this.room.on
+        this.room_door_event.on
             (
                 'presence', {
                 event: 'sync'
             }, () => {
-                console.log(JSON.stringify(this.room.presenceState()))
-                const players_email_array = Object.keys(this.room.presenceState());
+                console.log(JSON.stringify(this.room_door_event.presenceState()))
+                const players_email_array = Object.keys(this.room_door_event.presenceState());
                 this.my_layout.player_emails.forEach((element, index) => {
                     element.innerText = players_email_array[index] || "";
                 });
@@ -98,21 +99,55 @@ class Room {
                 async (status) => {
                     if (status !== 'SUBSCRIBED') { return }
 
-                    this.room.track({})
+                    this.room_door_event.track({})
                 })
+
         window.addEventListener('beforeunload', () => {
-            if (!this.room) {
+            if (!this.room_door_event) {
                 return;
             }
-            this.room.untrack();
+            this.room_door_event.untrack();
         })
+
+        // listen to player message chat
+        this.room_chat_event = this.supabase.channel(
+            this.room_id_value.toString()+"b"
+        );
+
+        this.room_chat_event.on(
+
+            'broadcast',
+            { event: 'test' },
+            (payload) => this.receiveMessage(payload)
+        )
+            .subscribe()
+
     }
+
+    receiveMessage(a: any) {
+        console.log(JSON.stringify(a));
+        
+        this.chat_box.textArea.value += a.payload.message + "\n";
+    }
+
     handleEventEnterLeaveRoom() {
-        if (!this.room.presenceState()) {
+        if (!this.room_door_event.presenceState()) {
             return;
         }
-        const players_email_array: string[] = Object.keys(this.room.presenceState());
+        const players_email_array: string[] = Object.keys(this.room_door_event.presenceState());
         this.DrawPlayerOnScreen(players_email_array);
+    }
+
+    async sendMessage() {
+        // this.chat_box.textArea.value += this.chat_box.input.value + '\n';
+        await this.supabase.channel(this.room_id_value.toString()+"b").send(
+            {
+                type: 'broadcast',
+                event: 'test',
+                payload: { message: this.my_email + ": "+ this.chat_box.input.value }
+            }
+        );
+        this.chat_box.input.value = "";
     }
 
     async constructView() {
@@ -185,7 +220,7 @@ class Room {
             // }
         }
 
-        
+
     }
 }
 
