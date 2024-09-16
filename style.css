@@ -81,7 +81,7 @@ body {
     background-color: cornsilk;
 }
 
-.chat-area>textarea {
+.chat-area>iframe {
     width: 90%;
     height: 60%;
     resize: none;

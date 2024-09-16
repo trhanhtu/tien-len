@@ -13,7 +13,7 @@ interface MatchInfo {
 
 interface ChatElement {
     input: HTMLInputElement,
-    textArea: HTMLTextAreaElement
+    textArea: HTMLIFrameElement
 }
 
 interface Layout {
@@ -61,7 +61,7 @@ class Room {
 
         this.chat_box = {
             input: window.checkNullAndGet<HTMLInputElement>(document.getElementById("input-box") as HTMLInputElement, "không tìm thấy tag input"),
-            textArea: window.checkNullAndGet<HTMLTextAreaElement>(document.getElementById("text-area") as HTMLTextAreaElement, "không tìm thấy tag text-area"),
+            textArea: window.checkNullAndGet<HTMLIFrameElement>(document.getElementById("text-area") as HTMLIFrameElement, "không tìm thấy tag text-area"),
         }
 
         this.resetRotate();
@@ -125,9 +125,14 @@ class Room {
     }
 
     receiveMessage(a: any) {
-        console.log(JSON.stringify(a));
-        
-        this.chat_box.textArea.value += a.payload.message + "\n";
+        const [sender,text] = (a.payload.message as string).split(":");
+        this.chat_box.textArea.srcdoc += 
+        `
+        <p>
+        <b style="color:red;">${sender}:</b>
+        ${text}
+        </p>`
+        ;
     }
 
     handleEventEnterLeaveRoom() {

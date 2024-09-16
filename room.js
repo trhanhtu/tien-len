@@ -74,8 +74,13 @@ class Room {
             .subscribe();
     }
     receiveMessage(a) {
-        console.log(JSON.stringify(a));
-        this.chat_box.textArea.value += a.payload.message + "\n";
+        const [sender, text] = a.payload.message.split(":");
+        this.chat_box.textArea.srcdoc +=
+            `
+        <p>
+        <b style="color:red;">${sender}:</b>
+        ${text}
+        </p>`;
     }
     handleEventEnterLeaveRoom() {
         if (!this.room_door_event.presenceState()) {
