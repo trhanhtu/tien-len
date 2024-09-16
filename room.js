@@ -67,6 +67,7 @@ class Room {
                 return;
             }
             this.room_door_event.untrack();
+            this.supabase.removeAllChannels();
         });
         // listen to player message chat
         this.room_chat_event = this.supabase.channel(this.room_id_value.toString() + "b");
@@ -74,7 +75,7 @@ class Room {
             .subscribe();
     }
     receiveMessage(a) {
-        const [sender, text] = a.payload.message.split(":");
+        const [sender, text] = a.payload.message.split(":", 2);
         this.chat_box.textArea.srcdoc +=
             `
         <p>
@@ -89,14 +90,27 @@ class Room {
         const players_email_array = Object.keys(this.room_door_event.presenceState());
         this.DrawPlayerOnScreen(players_email_array);
     }
-    async sendMessage() {
-        // this.chat_box.textArea.value += this.chat_box.input.value + '\n';
-        await this.supabase.channel(this.room_id_value.toString() + "b").send({
-            type: 'broadcast',
-            event: 'test',
-            payload: { message: this.my_email + ": " + this.chat_box.input.value }
-        });
-        this.chat_box.input.value = "";
+    async sendMessage(btn) {
+        try {
+            // Disable the button to prevent multiple sends
+            btn.disabled = true;
+            // Send the message using Supabase Realtime's broadcast channel
+            await this.supabase.channel(this.room_id_value.toString() + "b").send({
+                type: 'broadcast',
+                event: 'test',
+                payload: { message: this.my_email + ": " + this.chat_box.input.value }
+            });
+            // Clear the input field after sending the message
+            this.chat_box.input.value = "";
+        }
+        catch (error) {
+            console.error("Error sending message:", error);
+            // Optionally, provide user feedback if there's an error
+        }
+        finally {
+            // Re-enable the button after message is sent (or on error)
+            btn.disabled = false;
+        }
     }
     async constructView() {
         // get my name
